@@ -89,11 +89,12 @@ class Ui_MainWindow(object):
 
 
     def clearCentralWidget(self):
-        for widget in self.currentWidgets:
-            widget.setParent(None)
-            widget.hide()
-            widget.deleteLater()
-            self.currentWidgets.remove(widget)
+        if self.currentWidgets != []:
+            for widget in self.currentWidgets:
+                widget.setParent(None)
+                widget.hide()
+                widget.deleteLater()
+                self.currentWidgets.remove(widget)
 
     def listView(self):
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
@@ -164,15 +165,20 @@ class Ui_MainWindow(object):
         self.lineEdit.show()
         self.pushButton_4.show()
         self.scroll.show()
+        self.searchMovies()
 
-    def searchMovies(self):
+    def searchMovies(self, *args):
         for i in reversed(range(self.scrollLayout.count())): 
             self.scrollLayout.itemAt(i).widget().deleteLater()
-        names = mongo.getByName(self.lineEdit.text())
+        if args:
+            names = mongo.getSaved()
+            names = mongo.filterSavedByName(self.lineEdit.text())
+        else:
+            names = mongo.getByName(self.lineEdit.text())
         for movie in names:
             box = QtWidgets.QGroupBox()
             buttonName = QtWidgets.QPushButton(movie['name'], box)
-            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m))
+            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m, 'top'))
             buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
             buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
             buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -217,14 +223,17 @@ class Ui_MainWindow(object):
         self.clearCentralWidget()
         self.clearCentralWidget()
         self.clearCentralWidget()
-        self.listView()
         self.activeWindow = 'topMovies'
         self.switchWindows()
+        self.listView()
 
-    def movieView(self, movie):
+    def movieView(self, movie, window):
         movieWidgets = []
         
-        backButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.listWindow())
+        if window == 'top':  
+            backButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.listWindow())
+        elif window == 'saved':
+            backButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.savedWindow())
         backButton.setGeometry(QtCore.QRect(20, 83, 40, 40))
         backButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         backButton.setStyleSheet("QPushButton{border:none;background-color:none;}")
@@ -345,11 +354,11 @@ class Ui_MainWindow(object):
         for widget in movieWidgets:
             widget.show()
     
-    def movieWindow(self, movie):
+    def movieWindow(self, movie, window):
         self.clearCentralWidget()
         self.clearCentralWidget()
         self.clearCentralWidget()
-        self.movieView(movie)
+        self.movieView(movie, window)
 
     def switchWindows(self):
         if self.activeWindow == 'topMovies':
@@ -371,7 +380,7 @@ class Ui_MainWindow(object):
         self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
         self.lineEdit.setObjectName("lineEdit")
         
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.searchMovies())
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.searchMovies('saved'))
         self.pushButton_4.setGeometry(QtCore.QRect(295, 29, 24, 24))
         self.pushButton_4.setText("")
         self.pushButton_4.setStyleSheet("#pushButton_4 {border:none;background-color:none;}")
@@ -435,11 +444,12 @@ class Ui_MainWindow(object):
         self.pushButton_4.show()
         self.scroll.show()
 
-        names = mongo.getByName(self.lineEdit.text())
+        names = mongo.getSaved()
+        print(names)
         for movie in names:
             box = QtWidgets.QGroupBox()
             buttonName = QtWidgets.QPushButton(movie['name'], box)
-            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m))
+            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m, 'saved'))
             buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
             buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
             buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))

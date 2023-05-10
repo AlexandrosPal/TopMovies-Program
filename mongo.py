@@ -2,6 +2,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from pymongo import MongoClient
 from mongo_validator import movies_validator
+import re
 load_dotenv(find_dotenv())
 
 password = os.environ.get('MONGO_PWD')
@@ -44,14 +45,10 @@ def getByRating(min, max):
             {'rating': {'$lte': int(max)}}
         ]}
     movies = moviesApp.find(query)
-    for index, movie in enumerate(movies):
-        print(f"[{index+1}] Name: {movie['name']}  -  Rating: {movie['rating']}/10")
 
 def getByName(name):
     query = {'name'.lower(): {'$regex': f'.*{name.lower()}.*'}}
     movies = moviesApp.find(query)
-    # for index, movie in enumerate(movies):
-        # print(f"[{index+1}] Name: {movie['name']}  -  Rating: {movie['rating']}/10")
     return movies
 
 def countMovies():
@@ -68,6 +65,16 @@ def updateField(name, fieldName, value):
     newValue = {"$set": {f"{fieldName}": f"{value}"}}
     moviesApp.update_one(query, newValue)
 
+def getSaved():
+    query = {'savedState': 'saved'}
+    movies = moviesApp.find(query)
+    
+    return movies
+
+def filterSavedByName(name):
+    query = {'savedState': 'saved', 'name': {'$regex': name, "$options": "i"}}
+    movies = moviesApp.find(query)
+    return movies
 
 # createCollection()
 # insertMovie(name, rating, year, length, categories, description, director, stars, writers)
