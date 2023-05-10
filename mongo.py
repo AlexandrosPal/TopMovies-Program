@@ -40,14 +40,12 @@ def viewAllMovies():
         print(f"[{index+1}] Name: {movie['name']}  -  Rating: {movie['rating']}/10")
 
 def getByRating(min, max):
-    query = {'$and': [
-            {'rating': {'$gte': int(min)}},
-            {'rating': {'$lte': int(max)}}
-        ]}
+    query = {'rating': {'$gte': float(min), '$lte': float(max)}}
     movies = moviesApp.find(query)
+    return movies
 
 def getByName(name):
-    query = {'name'.lower(): {'$regex': f'.*{name.lower()}.*'}}
+    query = {'name': {'$regex': name, "$options": "i"}}
     movies = moviesApp.find(query)
     return movies
 
@@ -76,6 +74,26 @@ def filterSavedByName(name):
     movies = moviesApp.find(query)
     return movies
 
+def getAllCategories():
+    categories = []
+    movies = moviesApp.find()
+    for movie in movies:
+        for category in movie['categories']:
+            if category not in categories:
+                categories.append(category)
+    
+    return categories
+
+def getByRatingAndCategory(min, max, category):
+    if category == ' ':
+        query = {'rating': {'$gte': float(min), '$lte': float(max)}}
+    else:
+        query = {'rating': {'$gte': float(min), '$lte': float(max)}, 'categories': category}
+    movies = moviesApp.find(query)
+    return movies
+
+
+# getAllCategories()
 # createCollection()
 # insertMovie(name, rating, year, length, categories, description, director, stars, writers)
 # viewAllMovies()

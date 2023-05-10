@@ -5,6 +5,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.currentWidgets = []
         self.activeWindow = 'topMovies'
+        self.searchText = ''
         
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(375, 491)
@@ -91,13 +92,17 @@ class Ui_MainWindow(object):
     def clearCentralWidget(self):
         if self.currentWidgets != []:
             for widget in self.currentWidgets:
-                widget.setParent(None)
-                widget.hide()
-                widget.deleteLater()
-                self.currentWidgets.remove(widget)
+                try: 
+                    widget.setParent(None)
+                    widget.hide()
+                    widget.deleteLater()
+                    self.currentWidgets.remove(widget)
+                except RuntimeError:
+                    pass
 
     def listView(self):
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setText(self.searchText)
         self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
         self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
         self.lineEdit.setObjectName("lineEdit")
@@ -172,9 +177,11 @@ class Ui_MainWindow(object):
             self.scrollLayout.itemAt(i).widget().deleteLater()
         if args:
             names = mongo.getSaved()
-            names = mongo.filterSavedByName(self.lineEdit.text())
+            self.searchText = self.lineEdit.text()
+            names = mongo.filterSavedByName(self.searchText)
         else:
-            names = mongo.getByName(self.lineEdit.text())
+            self.searchText = self.lineEdit.text()
+            names = mongo.getByName(self.searchText)
         for movie in names:
             box = QtWidgets.QGroupBox()
             buttonName = QtWidgets.QPushButton(movie['name'], box)
@@ -251,6 +258,27 @@ class Ui_MainWindow(object):
         movieWidgets.append(backButton)
         self.currentWidgets.append(backButton)
         
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setText(self.searchText)
+        self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
+        self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
+        self.lineEdit.setObjectName("lineEdit")
+        
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.searchMovies())
+        self.pushButton_4.setGeometry(QtCore.QRect(295, 29, 24, 24))
+        self.pushButton_4.setText("")
+        self.pushButton_4.setStyleSheet("#pushButton_4 {border:none;background-color:none;}")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("assets/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_4.setIconSize(QtCore.QSize(24, 24))
+        self.pushButton_4.setIcon(icon3)
+        self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_4.setObjectName("pushButton_4")
+        movieWidgets.append(self.lineEdit)
+        movieWidgets.append(self.pushButton_4)
+        self.currentWidgets.append(self.lineEdit)
+        self.currentWidgets.append(self.pushButton_4)
+
         boxTitle = QtWidgets.QGroupBox(self.centralwidget)
         boxTitle.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
         boxTitle.setGeometry(QtCore.QRect(70, 70, 290, 70))
@@ -376,6 +404,7 @@ class Ui_MainWindow(object):
     
     def savedView(self):
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setText(self.searchText)
         self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
         self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
         self.lineEdit.setObjectName("lineEdit")
@@ -445,41 +474,40 @@ class Ui_MainWindow(object):
         self.scroll.show()
 
         names = mongo.getSaved()
-        print(names)
         for movie in names:
             box = QtWidgets.QGroupBox()
-            buttonName = QtWidgets.QPushButton(movie['name'], box)
-            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m, 'saved'))
-            buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
-            buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
-            buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            saved_buttonName = QtWidgets.QPushButton(movie['name'], box)
+            saved_buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m, 'saved'))
+            saved_buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
+            saved_buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
+            saved_buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
             
-            labelLength = QtWidgets.QLabel(f"{movie['length']}", box)
-            labelLength.setGeometry(QtCore.QRect(10, 30, 335, 24))
-            labelLength.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+            saved_labelLength = QtWidgets.QLabel(f"{movie['length']}", box)
+            saved_labelLength.setGeometry(QtCore.QRect(10, 30, 335, 24))
+            saved_labelLength.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
             
-            labelRating = QtWidgets.QLabel(f"{movie['rating']}/10", box)
-            labelRating.setGeometry(QtCore.QRect(60, 30, 335, 24))
-            labelRating.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+            saved_labelRating = QtWidgets.QLabel(f"{movie['rating']}/10", box)
+            saved_labelRating.setGeometry(QtCore.QRect(60, 30, 335, 24))
+            saved_labelRating.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
 
 
-            labelStar1 = QtWidgets.QLabel(f"{movie['stars'][0]}   -", box)
-            labelStar1.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-            labelStar1_Size = labelStar1.sizeHint()
-            labelStar1.setGeometry(QtCore.QRect(10, 55, labelStar1_Size.width()+5, labelStar1_Size.height()))
-            labelStar1.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            saved_labelStar1 = QtWidgets.QLabel(f"{movie['stars'][0]}   -", box)
+            saved_labelStar1.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            saved_labelStar1_Size = saved_labelStar1.sizeHint()
+            saved_labelStar1.setGeometry(QtCore.QRect(10, 55, saved_labelStar1_Size.width()+5, saved_labelStar1_Size.height()))
+            saved_labelStar1.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
             # ---
-            labelStar2 = QtWidgets.QLabel(f"{movie['stars'][1]}   -", box)
-            labelStar2.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-            labelStar2_Size = labelStar2.sizeHint()
-            labelStar2.setGeometry(QtCore.QRect(labelStar1.geometry().right() + 10, 55, labelStar2_Size.width()+5, labelStar2_Size.height()))
-            labelStar2.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            saved_labelStar2 = QtWidgets.QLabel(f"{movie['stars'][1]}   -", box)
+            saved_labelStar2.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            saved_labelStar2_Size = saved_labelStar2.sizeHint()
+            saved_labelStar2.setGeometry(QtCore.QRect(saved_labelStar1.geometry().right() + 10, 55, saved_labelStar2_Size.width()+5, saved_labelStar2_Size.height()))
+            saved_labelStar2.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
             # ---
-            labelStar3 = QtWidgets.QLabel(f"{movie['stars'][2]}", box)
-            labelStar3.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-            labelStar3_Size = labelStar3.sizeHint()
-            labelStar3.setGeometry(QtCore.QRect(labelStar2.geometry().right() + 10, 55, labelStar3_Size.width()+5, labelStar3_Size.height()))
-            labelStar3.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            saved_labelStar3 = QtWidgets.QLabel(f"{movie['stars'][2]}", box)
+            saved_labelStar3.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            saved_labelStar3_Size = saved_labelStar3.sizeHint()
+            saved_labelStar3.setGeometry(QtCore.QRect(saved_labelStar2.geometry().right() + 10, 55, saved_labelStar3_Size.width()+5, saved_labelStar3_Size.height()))
+            saved_labelStar3.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
             
             box.setMaximumHeight(80)
             box.setMaximumWidth(350)
@@ -490,6 +518,8 @@ class Ui_MainWindow(object):
             self.scrollLayout.insertWidget(300, box)
     
     def savedWindow(self):
+        self.clearCentralWidget()
+        self.clearCentralWidget()
         self.clearCentralWidget()
         self.clearCentralWidget()
         self.activeWindow = 'savedMovies'
@@ -534,13 +564,13 @@ class Ui_MainWindow(object):
         mixSpinBox.setSingleStep(0.1)
         mixSpinBox.setDecimals(1)
         mixSpinBox.setMaximum(10)
-        mixSpinBox.setGeometry(QtCore.QRect(145, 30, 100, 40))
+        mixSpinBox.setValue(7.5)
+        mixSpinBox.setGeometry(QtCore.QRect(30, 30, 70, 40))
         self.currentWidgets.append(mixSpinBox)
         mixSpinBox.show()
 
         maxSpinBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
-        maxSpinBox.setStyleSheet(
-            """
+        maxSpinBox.setStyleSheet("""
             QDoubleSpinBox {
                 background-color: #232323;
                 border: 2px solid #2a2a2a;
@@ -569,15 +599,196 @@ class Ui_MainWindow(object):
             QDoubleSpinBox::down-arrow {
                 image: url('assets/down-filled-triangular-arrow.png');
             }
-            """
-        )
+            """)
         maxSpinBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         maxSpinBox.setSingleStep(0.1)
         maxSpinBox.setDecimals(1)
         maxSpinBox.setMaximum(10)
-        maxSpinBox.setGeometry(QtCore.QRect(30, 30, 100, 40))
+        maxSpinBox.setValue(7.5)
+        maxSpinBox.setGeometry(QtCore.QRect(115, 30, 70, 40))
         self.currentWidgets.append(maxSpinBox)
         maxSpinBox.show()
+
+        combo_box = QtWidgets.QComboBox(self.centralwidget)
+        combo_box.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        combo_box.addItem(' ')
+        combo_box.addItems(mongo.getAllCategories())
+        combo_box.setStyleSheet(
+            """
+            QComboBox {
+                background-color: #232323;
+                border: 2px solid #2a2a2a;
+                border-radius: 5px;
+                color: #ffffff;
+                padding: 5px;
+                font-size: 13px;
+            }
+            QComboBox::drop-down {
+                width: 25px;
+                height: 25px;
+                subcontrol-origin: padding;
+                subcontrol-position: center right;
+                border: none;
+                background-color: #2a2a2a;
+            }
+            QComboBox::down-arrow {
+                image: url('assets/down-filled-triangular-arrow.png');
+                width: 10px;
+                height: 40px;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #232323;
+                border: 2px solid #2a2a2a;
+                border-radius: 5px;
+                color: #ffffff;
+                padding: 5px;
+                font-size: 13px;
+            }
+            QComboBox QAbstractItemView::item {
+                height: 25px;
+                padding: 5px;
+            }
+            QComboBox QAbstractItemView::item:selected {
+                background-color: #444444;
+            }
+            QScrollBar:vertical {
+                border: none;
+                background-color: #2a2a2a;
+                width: 10px;
+                margin: 0px 0px 0px 0px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #444444;
+                min-height: 20px;
+                border-radius: 5px;
+            }
+            QScrollBar::add-line:vertical {
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+            """
+        )
+        combo_box.setGeometry(QtCore.QRect(200, 35, 100, 25))
+        self.currentWidgets.append(combo_box)
+        combo_box.show()
+
+        filterButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: filterByRatingOrCategory())
+        filterButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        filterButton.setGeometry(QtCore.QRect(320, 33, 32, 32))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("assets/search3.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        filterButton.setIconSize(QtCore.QSize(32, 32))
+        filterButton.setIcon(icon)
+        filterButton.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        self.currentWidgets.append(filterButton)
+        filterButton.show()
+
+        self.scroll = QtWidgets.QScrollArea(self.centralwidget)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setGeometry(QtCore.QRect(0, 70, 375, 320))
+        scrollContent = QtWidgets.QWidget(self.scroll)
+        self.scrollLayout = QtWidgets.QVBoxLayout(scrollContent)
+        scrollContent.setLayout(self.scrollLayout)
+        self.scroll.setWidget(scrollContent)
+        self.scrollLayout.setAlignment(QtCore.Qt.AlignTop)
+        self.currentWidgets.append(self.scroll)
+        self.scroll.setStyleSheet("""
+        QWidget {
+            background-color: transparent;
+            border:none;
+        }""")
+        scrollContent.setStyleSheet("""
+        QWidget {
+            background-color: transparent;
+        }""")
+        self.scroll.verticalScrollBar().setStyleSheet("""
+        QScrollBar:vertical {
+            background-color: transparent;
+            width: 7px;
+            margin: 0px 0px 0px 0px;
+        }
+        QScrollBar::handle:vertical {
+            background-color: #57595a;
+            min-height: 20px;
+            border-radius: 3px;
+        }
+        QScrollBar::add-line:vertical {
+            background-color: transparent;
+            height: 10px;
+            subcontrol-position: bottom;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::sub-line:vertical {
+            background-color: transparent;
+            height: 10px;
+            subcontrol-position: top;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            background-color: none;
+            border-radius: 10px;
+        }
+        """)
+        self.currentWidgets.append(self.scroll)
+        self.scroll.show()
+        
+        def filterByRatingOrCategory():
+            for i in reversed(range(self.scrollLayout.count())):
+                self.scrollLayout.itemAt(i).widget().deleteLater()
+            names = mongo.getByRatingAndCategory(mixSpinBox.value(), maxSpinBox.value(), combo_box.currentText())
+            for movie in names:
+                box = QtWidgets.QGroupBox()
+                buttonName = QtWidgets.QPushButton(movie['name'], box)
+                buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m, 'top'))
+                buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
+                buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
+                buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+                
+                labelLength = QtWidgets.QLabel(f"{movie['length']}", box)
+                labelLength.setGeometry(QtCore.QRect(10, 30, 335, 24))
+                labelLength.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+                
+                labelRating = QtWidgets.QLabel(f"{movie['rating']}/10", box)
+                labelRating.setGeometry(QtCore.QRect(60, 30, 335, 24))
+                labelRating.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+
+                labelStar1 = QtWidgets.QLabel(f"{movie['stars'][0]}   -", box)
+                labelStar1.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+                labelStar1_Size = labelStar1.sizeHint()
+                labelStar1.setGeometry(QtCore.QRect(10, 55, labelStar1_Size.width()+5, labelStar1_Size.height()))
+                labelStar1.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+                # ---
+                labelStar2 = QtWidgets.QLabel(f"{movie['stars'][1]}   -", box)
+                labelStar2.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+                labelStar2_Size = labelStar2.sizeHint()
+                labelStar2.setGeometry(QtCore.QRect(labelStar1.geometry().right() + 10, 55, labelStar2_Size.width()+5, labelStar2_Size.height()))
+                labelStar2.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+                # ---
+                labelStar3 = QtWidgets.QLabel(f"{movie['stars'][2]}", box)
+                labelStar3.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+                labelStar3_Size = labelStar3.sizeHint()
+                labelStar3.setGeometry(QtCore.QRect(labelStar2.geometry().right() + 10, 55, labelStar3_Size.width()+5, labelStar3_Size.height()))
+                labelStar3.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+                
+                box.setMaximumHeight(80)
+                box.setMaximumWidth(350)
+                box.setMinimumHeight(80)
+                box.setMinimumWidth(350)
+                box.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
+
+                self.scrollLayout.insertWidget(300, box)
+
+
+
     
     def filterWindow(self):
         self.clearCentralWidget()
