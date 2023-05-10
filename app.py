@@ -3,8 +3,8 @@ import mongo
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        self.searchbar = []
         self.currentWidgets = []
+        self.activeWindow = 'topMovies'
         
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(375, 491)
@@ -17,18 +17,18 @@ class Ui_MainWindow(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
 
-        self.pushButton = QtWidgets.QPushButton(self.groupBox, clicked = lambda: self.clearCentralWidget())
+        self.pushButton = QtWidgets.QPushButton(self.groupBox, clicked = lambda: self.listWindow())
         self.pushButton.setGeometry(QtCore.QRect(50, 20, 51, 41))
         self.pushButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pushButton.setStyleSheet("#pushButton{border:none;background-color:none;}")
         self.pushButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("assets/quality3.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("assets/rank2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton.setIcon(icon)
         self.pushButton.setIconSize(QtCore.QSize(64, 64))
         self.pushButton.setObjectName("pushButton")
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_2 = QtWidgets.QPushButton(self.groupBox, clicked = lambda: self.savedWindow())
         self.pushButton_2.setGeometry(QtCore.QRect(280, 20, 61, 41))
         self.pushButton_2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pushButton_2.setStyleSheet("#pushButton_2 {border:none;background-color:none;}")
@@ -39,7 +39,7 @@ class Ui_MainWindow(object):
         self.pushButton_2.setIconSize(QtCore.QSize(29, 29))
         self.pushButton_2.setObjectName("pushButton_2")
 
-        self.pushButton_3 = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_3 = QtWidgets.QPushButton(self.groupBox, clicked = lambda: self.filterWindow())
         self.pushButton_3.setGeometry(QtCore.QRect(160, 10, 71, 51))
         self.pushButton_3.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pushButton_3.setStyleSheet("#pushButton_3 {border:none;background-color:none;}")
@@ -50,24 +50,8 @@ class Ui_MainWindow(object):
         self.pushButton_3.setIconSize(QtCore.QSize(48, 48))
         self.pushButton_3.setObjectName("pushButton_3")
 
-
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
-        self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
-        self.lineEdit.setObjectName("lineEdit")
-        
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.addLine())
-        self.pushButton_4.setGeometry(QtCore.QRect(295, 29, 24, 24))
-        self.pushButton_4.setText("")
-        self.pushButton_4.setStyleSheet("#pushButton_4 {border:none;background-color:none;}")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("assets/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_4.setIconSize(QtCore.QSize(24, 24))
-        self.pushButton_4.setIcon(icon3)
-        self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.pushButton_4.setObjectName("pushButton_4")
-
-        self.addLine()
+        self.listWindow()
+        self.searchMovies()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -88,17 +72,20 @@ class Ui_MainWindow(object):
     def on_enter_button(self, event):
         self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/rank2.png')))
     def on_leave_button(self, event):
-        self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/quality3.png')))
+        if self.activeWindow != 'topMovies':
+            self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/quality3.png')))
     
     def on_enter_button_2(self, event):
         self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark.png')))
     def on_leave_button_2(self, event):
-        self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark2.png')))
+        if self.activeWindow != 'savedMovies':
+            self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark2.png')))
     
     def on_enter_button_3(self, event):
         self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review.png')))
     def on_leave_button_3(self, event):
-        self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review2.png')))
+        if self.activeWindow != 'filterMovies':
+            self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review2.png')))
 
 
     def clearCentralWidget(self):
@@ -109,6 +96,24 @@ class Ui_MainWindow(object):
             self.currentWidgets.remove(widget)
 
     def listView(self):
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
+        self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
+        self.lineEdit.setObjectName("lineEdit")
+        
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.searchMovies())
+        self.pushButton_4.setGeometry(QtCore.QRect(295, 29, 24, 24))
+        self.pushButton_4.setText("")
+        self.pushButton_4.setStyleSheet("#pushButton_4 {border:none;background-color:none;}")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("assets/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_4.setIconSize(QtCore.QSize(24, 24))
+        self.pushButton_4.setIcon(icon3)
+        self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.currentWidgets.append(self.lineEdit)
+        self.currentWidgets.append(self.pushButton_4)
+
         self.scroll = QtWidgets.QScrollArea(self.centralwidget)
         self.scroll.setWidgetResizable(True)
         self.scroll.setGeometry(QtCore.QRect(0, 70, 375, 320))
@@ -156,14 +161,11 @@ class Ui_MainWindow(object):
             border-radius: 10px;
         }
         """)
+        self.lineEdit.show()
+        self.pushButton_4.show()
         self.scroll.show()
 
-    def addLine(self):
-        self.clearCentralWidget()
-        self.clearCentralWidget()
-        self.clearCentralWidget()
-        self.clearCentralWidget()
-        self.listView()
+    def searchMovies(self):
         for i in reversed(range(self.scrollLayout.count())): 
             self.scrollLayout.itemAt(i).widget().deleteLater()
         names = mongo.getByName(self.lineEdit.text())
@@ -209,11 +211,20 @@ class Ui_MainWindow(object):
             box.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
             
             self.scrollLayout.insertWidget(300, box)
+    
+    def listWindow(self):
+        self.clearCentralWidget()
+        self.clearCentralWidget()
+        self.clearCentralWidget()
+        self.clearCentralWidget()
+        self.listView()
+        self.activeWindow = 'topMovies'
+        self.switchWindows()
 
     def movieView(self, movie):
         movieWidgets = []
         
-        backButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.addLine())
+        backButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.listWindow())
         backButton.setGeometry(QtCore.QRect(20, 83, 40, 40))
         backButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         backButton.setStyleSheet("QPushButton{border:none;background-color:none;}")
@@ -340,6 +351,128 @@ class Ui_MainWindow(object):
         self.clearCentralWidget()
         self.movieView(movie)
 
+    def switchWindows(self):
+        if self.activeWindow == 'topMovies':
+            self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/rank2.png')))
+            self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark2.png')))
+            self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review2.png')))
+        elif self.activeWindow == 'savedMovies':
+            self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/quality3.png')))
+            self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark.png')))
+            self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review2.png')))
+        elif self.activeWindow == 'filterMovies':
+            self.pushButton.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/quality3.png')))
+            self.pushButton_2.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/bookmark2.png')))
+            self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review.png')))
+    
+    def savedView(self):
+        self.scroll = QtWidgets.QScrollArea(self.centralwidget)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setGeometry(QtCore.QRect(0, 70, 375, 320))
+        scrollContent = QtWidgets.QWidget(self.scroll)
+        self.scrollLayout = QtWidgets.QVBoxLayout(scrollContent)
+        scrollContent.setLayout(self.scrollLayout)
+        self.scroll.setWidget(scrollContent)
+        self.scrollLayout.setAlignment(QtCore.Qt.AlignTop)
+        self.currentWidgets.append(self.scroll)
+        self.scroll.setStyleSheet("""
+        QWidget {
+            background-color: transparent;
+            border:none;
+        }""")
+        scrollContent.setStyleSheet("""
+        QWidget {
+            background-color: transparent;
+        }""")
+
+        self.scroll.verticalScrollBar().setStyleSheet("""
+        QScrollBar:vertical {
+            background-color: transparent;
+            width: 7px;
+            margin: 0px 0px 0px 0px;
+        }
+        QScrollBar::handle:vertical {
+            background-color: #57595a;
+            min-height: 20px;
+            border-radius: 3px;
+        }
+        QScrollBar::add-line:vertical {
+            background-color: transparent;
+            height: 10px;
+            subcontrol-position: bottom;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::sub-line:vertical {
+            background-color: transparent;
+            height: 10px;
+            subcontrol-position: top;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            background-color: none;
+            border-radius: 10px;
+        }
+        """)
+        self.scroll.show()
+
+        names = mongo.getByName(self.lineEdit.text())
+        for movie in names:
+            box = QtWidgets.QGroupBox()
+            buttonName = QtWidgets.QPushButton(movie['name'], box)
+            buttonName.clicked.connect(lambda _, m=movie: self.movieWindow(m))
+            buttonName.setGeometry(QtCore.QRect(10, 5, 325, 24))
+            buttonName.setStyleSheet("QPushButton{text-align:left;color:#fffffd;font-size:16px;font-weight:bold;}")
+            buttonName.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            
+            labelLength = QtWidgets.QLabel(f"{movie['length']}", box)
+            labelLength.setGeometry(QtCore.QRect(10, 30, 335, 24))
+            labelLength.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+            
+            labelRating = QtWidgets.QLabel(f"{movie['rating']}/10", box)
+            labelRating.setGeometry(QtCore.QRect(60, 30, 335, 24))
+            labelRating.setStyleSheet("QLabel{text-align:left;color:#c6c6c6;font-size:11px;font-weight:bold;}")
+
+
+            labelStar1 = QtWidgets.QLabel(f"{movie['stars'][0]}   -", box)
+            labelStar1.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            labelStar1_Size = labelStar1.sizeHint()
+            labelStar1.setGeometry(QtCore.QRect(10, 55, labelStar1_Size.width()+5, labelStar1_Size.height()))
+            labelStar1.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            # ---
+            labelStar2 = QtWidgets.QLabel(f"{movie['stars'][1]}   -", box)
+            labelStar2.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            labelStar2_Size = labelStar2.sizeHint()
+            labelStar2.setGeometry(QtCore.QRect(labelStar1.geometry().right() + 10, 55, labelStar2_Size.width()+5, labelStar2_Size.height()))
+            labelStar2.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            # ---
+            labelStar3 = QtWidgets.QLabel(f"{movie['stars'][2]}", box)
+            labelStar3.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            labelStar3_Size = labelStar3.sizeHint()
+            labelStar3.setGeometry(QtCore.QRect(labelStar2.geometry().right() + 10, 55, labelStar3_Size.width()+5, labelStar3_Size.height()))
+            labelStar3.setStyleSheet("QLabel {color: #c6c6c6; font-size: 10px; font-weight: bold;}")
+            
+            box.setMaximumHeight(80)
+            box.setMaximumWidth(350)
+            box.setMinimumHeight(80)
+            box.setMinimumWidth(350)
+            box.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
+            
+            self.scrollLayout.insertWidget(300, box)
+    
+    def savedWindow(self):
+        self.clearCentralWidget()
+        self.clearCentralWidget()
+        self.activeWindow = 'savedMovies'
+        self.switchWindows()
+        self.savedView()
+
+    def filterView(self):
+        ...
+    
+    def filterWindow(self):
+        self.clearCentralWidget()
+        self.activeWindow = 'filterMovies'
+        self.switchWindows()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
