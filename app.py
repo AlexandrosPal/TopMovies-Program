@@ -366,6 +366,24 @@ class Ui_MainWindow(object):
             self.pushButton_3.setIcon(QtGui.QIcon(QtGui.QPixmap('assets/review.png')))
     
     def savedView(self):
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(40, 25, 295, 31))
+        self.lineEdit.setStyleSheet("#lineEdit {border:none;border-radius:6px;font-size:16px;padding-left:10px;}")
+        self.lineEdit.setObjectName("lineEdit")
+        
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.searchMovies())
+        self.pushButton_4.setGeometry(QtCore.QRect(295, 29, 24, 24))
+        self.pushButton_4.setText("")
+        self.pushButton_4.setStyleSheet("#pushButton_4 {border:none;background-color:none;}")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("assets/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_4.setIconSize(QtCore.QSize(24, 24))
+        self.pushButton_4.setIcon(icon3)
+        self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.currentWidgets.append(self.lineEdit)
+        self.currentWidgets.append(self.pushButton_4)
+        
         self.scroll = QtWidgets.QScrollArea(self.centralwidget)
         self.scroll.setWidgetResizable(True)
         self.scroll.setGeometry(QtCore.QRect(0, 70, 375, 320))
@@ -413,6 +431,8 @@ class Ui_MainWindow(object):
             border-radius: 10px;
         }
         """)
+        self.lineEdit.show()
+        self.pushButton_4.show()
         self.scroll.show()
 
         names = mongo.getByName(self.lineEdit.text())
@@ -467,12 +487,94 @@ class Ui_MainWindow(object):
         self.savedView()
 
     def filterView(self):
-        ...
+        mixSpinBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
+        mixSpinBox.setStyleSheet(
+            """
+            QDoubleSpinBox {
+                background-color: #232323;
+                border: 2px solid #2a2a2a;
+                border-radius: 5px;
+                color: #ffffff;
+                padding: 5px;
+                font-size: 16px;
+            }
+            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                padding: 5px;
+                width: 20px;
+                height: 8px;
+            }
+            QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+                background-color: #444444;
+            }
+            QDoubleSpinBox::up-arrow, QDoubleSpinBox::down-arrow {
+                width: 10px;
+                height: 10px;
+            }
+            QDoubleSpinBox::up-arrow {
+                image: url('assets/caret-arrow-up.png');
+            }
+            QDoubleSpinBox::down-arrow {
+                image: url('assets/down-filled-triangular-arrow.png');
+            }
+            """
+        )
+        mixSpinBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        mixSpinBox.setSingleStep(0.1)
+        mixSpinBox.setDecimals(1)
+        mixSpinBox.setMaximum(10)
+        mixSpinBox.setGeometry(QtCore.QRect(145, 30, 100, 40))
+        self.currentWidgets.append(mixSpinBox)
+        mixSpinBox.show()
+
+        maxSpinBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
+        maxSpinBox.setStyleSheet(
+            """
+            QDoubleSpinBox {
+                background-color: #232323;
+                border: 2px solid #2a2a2a;
+                border-radius: 5px;
+                color: #ffffff;
+                padding: 5px;
+                font-size: 16px;
+            }
+            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                padding: 5px;
+                width: 20px;
+                height: 8px;
+            }
+            QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+                background-color: #444444;
+            }
+            QDoubleSpinBox::up-arrow, QDoubleSpinBox::down-arrow {
+                width: 10px;
+                height: 10px;
+            }
+            QDoubleSpinBox::up-arrow {
+                image: url('assets/caret-arrow-up.png');
+            }
+            QDoubleSpinBox::down-arrow {
+                image: url('assets/down-filled-triangular-arrow.png');
+            }
+            """
+        )
+        maxSpinBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        maxSpinBox.setSingleStep(0.1)
+        maxSpinBox.setDecimals(1)
+        maxSpinBox.setMaximum(10)
+        maxSpinBox.setGeometry(QtCore.QRect(30, 30, 100, 40))
+        self.currentWidgets.append(maxSpinBox)
+        maxSpinBox.show()
     
     def filterWindow(self):
         self.clearCentralWidget()
+        self.clearCentralWidget()
         self.activeWindow = 'filterMovies'
         self.switchWindows()
+        self.filterView()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
