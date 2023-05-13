@@ -2,7 +2,6 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from pymongo import MongoClient
 from mongo_validator import movies_validator
-import re
 load_dotenv(find_dotenv())
 
 password = os.environ.get('MONGO_PWD')
