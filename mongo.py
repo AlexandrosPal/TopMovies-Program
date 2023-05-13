@@ -99,5 +99,5 @@ def getByRatingAndCategory(min, max, category):
 # viewAllMovies()
 # getByRating(8, 10)
 # getByName('Pulp')
-countMovies()
-# addNewField("savedState", "not saved")
+# countMovies()
+# addNewField("userRating", 0)

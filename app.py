@@ -346,6 +346,143 @@ class Ui_MainWindow(object):
         boxRate.setGeometry(QtCore.QRect(15, 310, 130, 70))
         movieWidgets.append(boxRate)
         self.currentWidgets.append(boxRate)
+        fullStarIcon = QtGui.QIcon()
+        halfStarIcon = QtGui.QIcon()
+        emptyStarIcon = QtGui.QIcon()
+        fullStarIcon.addPixmap(QtGui.QPixmap("assets/star.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        halfStarIcon.addPixmap(QtGui.QPixmap("assets/half-star.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        emptyStarIcon.addPixmap(QtGui.QPixmap("assets/empty-star.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        star1 = QtWidgets.QPushButton(boxRate)
+        star2 = QtWidgets.QPushButton(boxRate)
+        star3 = QtWidgets.QPushButton(boxRate)
+        star4 = QtWidgets.QPushButton(boxRate)
+        star5 = QtWidgets.QPushButton(boxRate)
+       
+        rateBox = QtWidgets.QDoubleSpinBox(boxRate)
+        rateBox.setStyleSheet(
+            """
+            QDoubleSpinBox {
+                background-color: #232323;
+                border: 2px solid #2a2a2a;
+                border-radius: 5px;
+                color: #ffffff;
+                padding: 5px;
+                font-size: 16px;
+            }
+            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                padding: 5px;
+                width: 20px;
+                height: 8px;
+            }
+            QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+                background-color: #444444;
+            }
+            QDoubleSpinBox::up-arrow, QDoubleSpinBox::down-arrow {
+                width: 10px;
+                height: 10px;
+            }
+            QDoubleSpinBox::up-arrow {
+                image: url('assets/caret-arrow-up.png');
+            }
+            QDoubleSpinBox::down-arrow {
+                image: url('assets/down-filled-triangular-arrow.png');
+            }
+            """
+        )
+        rateBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        rateBox.setSingleStep(1)
+        rateBox.setDecimals(0)
+        rateBox.setMaximum(10)
+        rateBox.setValue(float(movie['userRating']))
+        rateBox.setGeometry(QtCore.QRect(15, 30, 70, 40))
+        self.currentWidgets.append(rateBox)
+
+        star1.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        star2.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        star3.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        star4.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        star5.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        star1.setGeometry(QtCore.QRect(25, 10, 16, 16))
+        star2.setGeometry(QtCore.QRect(40, 10, 16, 16))
+        star3.setGeometry(QtCore.QRect(55, 10, 16, 16))
+        star4.setGeometry(QtCore.QRect(70, 10, 16, 16))
+        star5.setGeometry(QtCore.QRect(85, 10, 16, 16))
+        check = QtWidgets.QPushButton(boxRate, clicked = lambda: rate(rateBox.value()))
+        check.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        check.setGeometry(QtCore.QRect(90, 32, 32, 32))
+        check.setStyleSheet("QPushButton{border:none;background-color:none;}")
+        checkIcon = QtGui.QIcon()
+        checkIcon.addPixmap(QtGui.QPixmap("assets/check.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        check.setIcon(checkIcon)
+        stars = [star1, star2, star3, star4, star5]
+
+        def updateStars():
+            if movie['userRating'] == '0.0':
+                for i in range(5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '1.0':
+                star1.setIcon(halfStarIcon)
+                for i in range(1, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '2.0':
+                star1.setIcon(fullStarIcon)
+                for i in range(1, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '3.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(halfStarIcon)
+                for i in range(2, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '4.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                for i in range(2, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '5.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(halfStarIcon)
+                for i in range(3, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '6.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(fullStarIcon)
+                for i in range(3, 5):
+                    stars[i].setIcon(emptyStarIcon)
+            if movie['userRating'] == '7.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(fullStarIcon)
+                star4.setIcon(halfStarIcon)
+                star5.setIcon(emptyStarIcon)
+            if movie['userRating'] == '8.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(fullStarIcon)
+                star4.setIcon(fullStarIcon)
+                star5.setIcon(emptyStarIcon)
+            if movie['userRating'] == '9.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(fullStarIcon)
+                star4.setIcon(fullStarIcon)
+                star4.setIcon(halfStarIcon)
+            if movie['userRating'] == '10.0':
+                star1.setIcon(fullStarIcon)
+                star2.setIcon(fullStarIcon)
+                star3.setIcon(fullStarIcon)
+                star4.setIcon(fullStarIcon)
+                star5.setIcon(fullStarIcon)
+
+        updateStars()
+ 
+        
+        def rate(userRating):
+            mongo.updateField(movie['name'], 'userRating', userRating)
+            updateStars()
 
         boxSave = QtWidgets.QGroupBox(self.centralwidget)
         boxSave.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
@@ -786,9 +923,6 @@ class Ui_MainWindow(object):
                 box.setStyleSheet(".QGroupBox {background-color:#323232;border:none;border-radius:10px;}")
 
                 self.scrollLayout.insertWidget(300, box)
-
-
-
     
     def filterWindow(self):
         self.clearCentralWidget()
